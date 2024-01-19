@@ -34,12 +34,12 @@ def create_spectrum(audio_file, start_time, end_time):
     filename = os.path.basename(audio_file)
     file_no_ext = os.path.splitext(filename)[0]
 
-    spectrum_width = 12960
+    spectrum_width = 8640
 
     spectrum_image = f"{directory}/{file_no_ext}_python.png"
 
     ffmpeg_command = (f'ffmpeg -ss {start_time} -to {end_time} -i "{audio_file}" '
-                      f'-lavfi showspectrumpic=legend=disabled:gain=4:s={spectrum_width}x1080:fscale'
+                      f'-lavfi showspectrumpic=legend=disabled:gain=4:s={spectrum_width}x720:fscale'
                       f'=lin "{spectrum_image}" -y')
 
     print(ffmpeg_command)
@@ -69,8 +69,8 @@ def create_video(audio_file, start_time, end_time, spectrum_image, spectrum_widt
 
     video_file = f"{directory}/{file_no_ext}_python.mp4"
 
-    ffmpeg_command = (f'ffmpeg -loop 1 -framerate 60 -i "{spectrum_image}" -ss {start_time} -to {end_time} -i "{audio_file}" -shortest -filter_complex '
-                      f'"color=c=black:s=1920x1080:r=60[black]; [0:v][black]hstack[stacked]; [stacked]crop=1920:1080:t*{scroll_pixels_per_second}:0[cropped]; [cropped]drawtext=text='
+    ffmpeg_command = (f'ffmpeg -loop 1 -framerate 30 -i "{spectrum_image}" -ss {start_time} -to {end_time} -i "{audio_file}" -shortest -filter_complex '
+                      f'"color=c=black:s=1280x720:r=30[black]; [0:v][black]hstack[stacked]; [stacked]crop=1280:720:t*{scroll_pixels_per_second}:0[cropped]; [cropped]drawtext=text='
                        "'%{pts\:gmtime\:" + str(int(timestamp_start.timestamp())) + "}':fontfile=C:\\\\Windows\\\\Fonts\\\\Arial.ttf:fontsize=48:"
                        'fontcolor=white:box=1:boxcolor=black@0.5:boxborderw=5:x=50:y=50[out]" -map "[out]" '
                       f'-map 1:a -c:v libx264 -b:v 5M -movflags faststart -preset ultrafast -tune stillimage '
